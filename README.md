@@ -1,4 +1,4 @@
-# My-Threejs-Portfolio
+# My Threejs Portfolio
 
 ## Setup
 Download [Node.js](https://nodejs.org/en/download/).
