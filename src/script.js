@@ -6,17 +6,42 @@ import Stats from 'stats.js'
 import * as dat from 'dat.gui'
 import gsap from 'gsap'
 
+import { RectAreaLightHelper } from 'three/examples/jsm/helpers/RectAreaLightHelper.js'
+
 
 
 
 /**
- * Base
+ * ------------------------------------------------------------------ Base
  */
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
 
 // Scene
 const scene = new THREE.Scene()
+
+
+
+// Overlay
+ const overlayGeometry = new THREE.PlaneBufferGeometry(2,2,1,1)
+ const overlayMaterial = new THREE.ShaderMaterial({
+     transparent:true,
+     uniforms:{
+         uAlpha:{ value: 1}
+     },
+     vertexShader:`
+     void main(){
+         gl_Position = vec4(position, 1.0);
+     }`,
+     fragmentShader: `
+     uniform float uAlpha;
+     void main(){
+         gl_FragColor = vec4(0.0, 0.0, 0.0, uAlpha);
+     }`
+ })
+ const overlay = new THREE.Mesh(overlayGeometry,overlayMaterial)
+ scene.add(overlay)
+
 
 // Dat.gui
 
@@ -35,7 +60,7 @@ scene.traverse((child) => {
         
         child.material.envMap = environmentMAp
         child.material.envMapIntensity = 0
-        gsap.to(child.material,{duration: 4, delay: 1, envMapIntensity:0.15})
+        gsap.to(child.material,{duration: 4, delay: 1, envMapIntensity:0.1})
 
         // if (child.name != "base"){
 
@@ -75,11 +100,38 @@ scene.traverse((child) => {
 // const texture_normal = textureLoader.load("/concrete/vjctbag_2K_Normal.jpg")
 // const texture_roughness = textureLoader.load("/concrete/vjctbag_2K_Roughness.jpg") 
 
+
+/**
+ *  ------------------------------------------------------------------ Loader Maneger
+ */
+
+const loadingBarElement = document.querySelector(".loading_bar")
+
+const loadingManager = new THREE.LoadingManager(
+    () => {
+
+        gsap.delayedCall(1, () => {
+            gsap.to(overlayMaterial.uniforms.uAlpha, {duration: 1, value:0})
+            loadingBarElement.style.transform = ""
+            loadingBarElement.classList.add("ended")
+
+        })
+ 
+    },
+    (itemUrl, itemsLoaded, itemsTotal) => {
+        const progressRatio = itemsLoaded / 10
+        loadingBarElement.style.transform = `scaleX(${progressRatio})`
+        console.log(itemsLoaded,itemsTotal,progressRatio)
+    },
+    () => {
+        console.log("error")
+    }
+)
 /**
  *  Cube Texture Loader
  */
 
-const cubeTextureLoader = new THREE.CubeTextureLoader()
+const cubeTextureLoader = new THREE.CubeTextureLoader(loadingManager)
 
 // Environment Map
 
@@ -92,39 +144,14 @@ const environmentMAp = cubeTextureLoader.load([
     "/cube_map/nz.png"
 ])
 environmentMAp.encoding = THREE.sRGBEncoding
-// scene.background = environmentMAp
+scene.background = environmentMAp
 scene.environment = environmentMAp
 
-
 /**
- * Sizes
- */
- const sizes = {
-    width: window.innerWidth,
-    height: window.innerHeight
-}
-
-window.addEventListener('resize', () =>
-{
-    // Update sizes
-    sizes.width = window.innerWidth
-    sizes.height = window.innerHeight
-
-    // Update camera
-    camera.aspect = sizes.width / sizes.height
-    camera.updateProjectionMatrix()
-
-    // Update renderer
-    renderer.setSize(sizes.width, sizes.height)
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-})
-
-
-/**
- * ------------------------------------------------------------------ Models Loader
+ * Models Loader
  */
 
-const gltfLoader = new GLTFLoader()
+const gltfLoader = new GLTFLoader(loadingManager)
 gltfLoader.load(
     "/gltf/scene.gltf",
     (gltf) => {
@@ -151,6 +178,28 @@ gltfLoader.load(
     // }
 )
 
+/**
+ * ------------------------------------------------------------------ Sizes
+ */
+ const sizes = {
+    width: window.innerWidth,
+    height: window.innerHeight
+}
+
+window.addEventListener('resize', () =>
+{
+    // Update sizes
+    sizes.width = window.innerWidth
+    sizes.height = window.innerHeight
+
+    // Update camera
+    camera.aspect = sizes.width / sizes.height
+    camera.updateProjectionMatrix()
+
+    // Update renderer
+    renderer.setSize(sizes.width, sizes.height)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+})
 
 /**
  * ------------------------------------------------------------------ Cursor
@@ -164,9 +213,9 @@ window.addEventListener("mousemove", (event) => {
     cursor.y = event.clientY / sizes.height - 0.5
 
 
-    gsap.to(camera.position,{duration: 2, delay: 0.05, x:Math.cos(cursor.x * Math.PI/16)*9.5})
-    gsap.to(camera.position,{duration: 2, delay: 0.05, z:Math.sin(cursor.x * Math.PI/16)*9.5})
-    gsap.to(camera.position,{duration: 2, delay: 0.05, y:-cursor.y * 2 + 2})
+    // gsap.to(camera.position,{duration: 2, delay: 0.05, x:Math.cos(cursor.x * Math.PI/16)*9.5})
+    // gsap.to(camera.position,{duration: 2, delay: 0.05, z:Math.sin(cursor.x * Math.PI/16)*9.5})
+    // gsap.to(camera.position,{duration: 2, delay: 0.05, y:-cursor.y * 2 + 2})
 
 })
 
@@ -216,9 +265,13 @@ window.addEventListener("dblclick", () => {
 
 
 // ------------------------------------------------------------------ Controls
-// const controls = new OrbitControls(camera, canvas)
-// controls.enableDamping = true
+const controls = new OrbitControls(camera, canvas)
+controls.enableDamping = true
+controls.zoomSpeed = 0.25
+controls.target = new THREE.Vector3( 0, 1, 0 )
 
+// controls.autoRotate = true
+// controls.autoRotateSpeed = -0.2
 /**
  * ------------------------------------------------------------------ Geometry
  */
@@ -241,30 +294,45 @@ window.addEventListener("dblclick", () => {
  */
 
 //PointLight1
- const point_light1 = new THREE.PointLight( 0xffffff, 0, 100 )
- gsap.to(point_light1,{duration: 4, delay: 1, intensity:3})
+//  const point_light1 = new THREE.PointLight( 0xffffff, 0, 100 )
+//  gsap.to(point_light1,{duration: 4, delay: 1, intensity:3})
 
- point_light1.position.set(1.8, 2, 1.85)
- scene.add( point_light1 )
+//  point_light1.position.set(1.8, 2, 1.85)
+//  scene.add( point_light1 )
 
  //PointLight2
- const point_light2 = new THREE.PointLight( 0x00B8FF, 0, 100 )
- gsap.to(point_light2,{duration: 4, delay: 1, intensity:2})
+//  const point_light2 = new THREE.PointLight( 0x00B8FF, 0, 100 )
+//  gsap.to(point_light2,{duration: 4, delay: 1, intensity:2})
 
- point_light2.position.set(2, 1.35, -2)
- scene.add( point_light2 )
+//  point_light2.position.set(2, 1.35, -2)
+//  scene.add( point_light2 )
+
+//Rect Light 1 
+const rectAreaLight1 = new THREE.RectAreaLight(0x00B8FF , 0, 0.7, 0.7)
+gsap.to(rectAreaLight1,{duration: 4, delay: 1, intensity:30})
+rectAreaLight1.position.set(2, 1.40, -2)
+rectAreaLight1.lookAt(0,1.2,0)
+scene.add(rectAreaLight1)
+
+//Rect Light 2 
+const rectAreaLight2 = new THREE.RectAreaLight(0xffffff , 0, 0.5, 0.5)
+gsap.to(rectAreaLight2,{duration: 4, delay: 1, intensity:50})
+rectAreaLight2.position.set(1.85, 1.95, 1.9)
+rectAreaLight2.lookAt(0,1,0)
+scene.add(rectAreaLight2)
+
+//Light Helper
+
+// const lightHelper = new RectAreaLightHelper(rectAreaLight2)
+// scene.add(lightHelper)
 
 
 //Ambiente Light
 // const amb_light = new THREE.AmbientLight(0xffffff, 0.05)
 // scene.add(amb_light)
 
-//Sphere
-// const sphere_geometry = new THREE.SphereGeometry( 0.1, 32, 16 );
-// const sphere_material = new THREE.MeshBasicMaterial( { color: 0x00B8FF } );
-// const sphere = new THREE.Mesh( sphere_geometry, sphere_material );
-// sphere.position.set(point_light2.position.x,point_light2.position.y,point_light2.position.z)
-// scene.add( sphere );
+
+
 
 /**
  * ------------------------------------------------------------------ Renderer
@@ -278,7 +346,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 renderer.physicallyCorrectLights = true
 renderer.outputEncoding = THREE.sRGBEncoding
 renderer.toneMapping = THREE.ReinhardToneMapping
-renderer.toneMappingExposure = 1
+renderer.toneMappingExposure = 1.5
 
 // renderer.shadowMap.enabled = true
 // renderer.shadowMap.type = THREE.PCFSoftShadowMap
@@ -303,9 +371,9 @@ const tick = () =>
     lastElapsedTime = elapsedTime
 
     // Update controls
-    // controls.update()
+    controls.update()
 
-    camera.lookAt(0,1,0)
+    // camera.lookAt(0,1,0)
 
 
 
