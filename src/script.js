@@ -7,6 +7,7 @@ import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
 import Stats from 'stats.js'
 // import * as dat from 'dat.gui'
 import gsap from 'gsap'
+import { Mesh } from 'three'
 
 
 
@@ -126,8 +127,8 @@ texture_bake1.minFilter = THREE.LinearFilter
 
 
 
-// const texture_bake1_mask = textureLoader.load("gltf/bake1_mask.jpg")
-// texture_bake1_mask.minFilter = THREE.LinearFilter
+const texture_bake1_mask = textureLoader.load("gltf/bake1_mask.jpg")
+texture_bake1_mask.minFilter = THREE.LinearFilter
 
 const texture_bake2 = textureLoader.load("gltf/bake2.jpg")
 texture_bake2.flipY = false
@@ -140,13 +141,6 @@ const texture_bake3 = textureLoader.load("gltf/bake3.jpg")
 texture_bake3.flipY = false
 texture_bake3.encoding = THREE.sRGBEncoding
 texture_bake3.minFilter = THREE.LinearFilter
-
-
-// const texture_color = textureLoader.load("/concrete/vjctbag_2K_Albedo.jpg")
-// const texture_ao = textureLoader.load("/concrete/vjctbag_2K_AO.jpg")
-// const texture_displacement = textureLoader.load("/concrete/vjctbag_2K_Displacement.jpg")
-// const texture_normal = textureLoader.load("/concrete/vjctbag_2K_Normal.jpg")
-// const texture_roughness = textureLoader.load("/concrete/vjctbag_2K_Roughness.jpg") 
 
 
 /**
@@ -183,41 +177,18 @@ dracoLoader.setDecoderPath('draco/')
 
 // GLTF Materials
 
-const  bake1Material = new THREE.MeshBasicMaterial({ map: texture_bake1, side: THREE.FrontSide})
-const  bake1BackSideMaterial = new THREE.MeshBasicMaterial({color: 0x000000, side: THREE.BackSide})
+const  bake1Material = new THREE.MeshBasicMaterial({ map: texture_bake1, alphaMap:texture_bake1_mask, side: THREE.FrontSide, transparent: true})
+const  bake1BackSideMaterial = new THREE.MeshBasicMaterial({color: 0x000000, alphaMap:texture_bake1_mask, side: THREE.BackSide, transparent: true})
 const  bake2Material = new THREE.MeshBasicMaterial({map: texture_bake2})
 const  bake3Material = new THREE.MeshBasicMaterial({map: texture_bake3})
 
 const lightBlueMaterial = new THREE.MeshBasicMaterial({color: 0x00B8FF})
 const lightWhiteMaterial = new THREE.MeshBasicMaterial({color: 0xFFFFFF})
 
+//Varabel
 
-// OBJ Loader
-
-// const objLoader = new OBJLoader(loadingManager)
-
-// objLoader.load("obj/scene.obj",
-//     (obj) => {
-//         console.log(obj)
-        
-//         const lightBlueMesh = obj.children.find(child => child.name == "light_blue")
-//         const lightWhiteMesh = obj.children.find(child => child.name == "light_white")
-//         const planeMesh = obj.children.find(child => child.name == "Plane")
-//         const objectsMesh = obj.children.find(child => child.name == "objects")
-//         const lightsMesh = obj.children.find(child => child.name == "lights")
-
-//         lightBlueMesh.material = lightBlueMaterial
-//         lightWhiteMesh.material = lightWhiteMaterial
-//         planeMesh.material = bake1Material
-//         objectsMesh.material = bake2Material
-//         lightsMesh.material = bake3Material
-
-        
-//         scene.add(obj)
-
-//     })
-
-
+const floorDistance = 4
+const offsetDistance = 0.05
 
 
 // GLTF Loader
@@ -226,13 +197,14 @@ const gltfLoader = new GLTFLoader(loadingManager)
 gltfLoader.setDRACOLoader(dracoLoader)
 
 gltfLoader.load(
-    "/gltf/scene.glb",
+    "/gltf/scene_simple.glb",
     (gltf) => {
 
+        //Scene 1
         const lightBlueMesh = gltf.scene.children.find(child => child.name == "light_blue")
         const lightWhiteMesh = gltf.scene.children.find(child => child.name == "light_white")
         const planeMesh = gltf.scene.children.find(child => child.name == "plane")
-        const planeBackSideMesh = gltf.scene.children.find(child => child.name == "plane_back")
+        const planeBackSideMesh = planeMesh.clone()
         const objectsMesh = gltf.scene.children.find(child => child.name == "objects")
         const lightsMesh = gltf.scene.children.find(child => child.name == "lights")
 
@@ -240,13 +212,50 @@ gltfLoader.load(
         lightWhiteMesh.material = lightWhiteMaterial
         planeMesh.material = bake1Material
         planeBackSideMesh.material = bake1BackSideMaterial
+
         objectsMesh.material = bake2Material
         lightsMesh.material = bake3Material
 
+        planeMesh.position.y =+ -0.0001
+        planeBackSideMesh.position.y =+ -0.0001
+        scene.add(planeBackSideMesh)
+
+        //Scene 2
+        const plane2Mesh = planeMesh.clone()
+        const plane2BackSideMesh = planeMesh.clone()
+        const cube2Mesh = new THREE.BoxBufferGeometry(1,1,1)
+
+        plane2Mesh.material = bake1Material
+        plane2BackSideMesh.material = bake1BackSideMaterial
+
+        const cube2 = new Mesh(cube2Mesh,lightBlueMaterial)
+
+        plane2Mesh.position.y =+ -floorDistance
+        plane2BackSideMesh.position.y =+ -floorDistance
+        cube2.position.y = -floorDistance + offsetDistance + 0.5
+
+
+        scene.add(plane2Mesh,plane2BackSideMesh,cube2)
+
+        //Scene 3
+        const plane3Mesh = planeMesh.clone()
+        const plane3BackSideMesh = planeMesh.clone()
+
+        plane3Mesh.material = bake1Material
+        plane3BackSideMesh.material = bake1BackSideMaterial
+
+        const cube3 = new Mesh(cube2Mesh,lightBlueMaterial)
+
+        plane3Mesh.position.y =+ -floorDistance *  2
+        plane3BackSideMesh.position.y =+ -floorDistance * 2
+        cube3.position.y = -(floorDistance * 2) + offsetDistance + 0.5
+
         
-        // objectsMesh.geometry.drawRange(1,10)
-        console.log(gltf.scene.children)
+        scene.add(plane3Mesh,plane3BackSideMesh,cube3)
+
+        console.log(gltf.scene.children.name)
         scene.add(gltf.scene)
+        
     }
 )
 
@@ -285,9 +294,9 @@ window.addEventListener("mousemove", (event) => {
     cursor.y = event.clientY / sizes.height - 0.5
 
 
-    gsap.to(camera.position,{duration: 2, delay: 0.05, x:Math.cos(cursor.x * Math.PI/16)*9.5})
-    gsap.to(camera.position,{duration: 2, delay: 0.05, z:Math.sin(cursor.x * Math.PI/16)*9.5})
-    gsap.to(camera.position,{duration: 2, delay: 0.05, y:-cursor.y * 2 + 2})
+    gsap.to(camera.position,{duration: 2, delay: 0.05, x:Math.cos(cursor.x * Math.PI/6)*9.5})
+    gsap.to(camera.position,{duration: 2, delay: 0.05, z:Math.sin(cursor.x * Math.PI/6)*9.5})
+    // gsap.to(camera.position,{duration: 2, delay: 0.05, y:-cursor.y * 2 + 2})
 
 })
 
@@ -332,6 +341,15 @@ window.addEventListener("dblclick", () => {
     }
 })
 
+// Scroll
+
+let scrollY = window.scrollY
+
+window.addEventListener("scroll", () => {
+    scrollY = window.scrollY
+
+})
+
 
 // ------------------------------------------------------------------ Controls
 // const controls = new OrbitControls(camera, canvas)
@@ -363,45 +381,6 @@ window.addEventListener("dblclick", () => {
  * ------------------------------------------------------------------  Light
  */
 
-//PointLight1
-//  const point_light1 = new THREE.PointLight( 0xffffff, 0, 100 )
-//  gsap.to(point_light1,{duration: 4, delay: 1, intensity:3})
-
-//  point_light1.position.set(1.8, 2, 1.85)
-//  scene.add( point_light1 )
-
- //PointLight2
-//  const point_light2 = new THREE.PointLight( 0x00B8FF, 0, 100 )
-//  gsap.to(point_light2,{duration: 4, delay: 1, intensity:2})
-
-//  point_light2.position.set(2, 1.35, -2)
-//  scene.add( point_light2 )
-
-//Rect Light 1 
-// const rectAreaLight1 = new THREE.RectAreaLight(0x00B8FF , 0, 0.7, 0.7)
-// gsap.to(rectAreaLight1,{duration: 4, delay: 1, intensity:30})
-// rectAreaLight1.position.set(2, 1.40, -2)
-// rectAreaLight1.lookAt(0,1.2,0)
-// scene.add(rectAreaLight1)
-
-// // Rect Light 2 
-// const rectAreaLight2 = new THREE.RectAreaLight(0xffffff , 0, 0.5, 0.5)
-// gsap.to(rectAreaLight2,{duration: 4, delay: 1, intensity:50})
-// rectAreaLight2.position.set(1.85, 1.95, 1.9)
-// rectAreaLight2.lookAt(0,1,0)
-// scene.add(rectAreaLight2)
-
-//Light Helper
-
-// const lightHelper = new RectAreaLightHelper(rectAreaLight2)
-// scene.add(lightHelper)
-
-
-//Ambiente Light
-// const amb_light = new THREE.AmbientLight(0xffffff, 0.05)
-// scene.add(amb_light)
-
-
 
 
 /**
@@ -415,12 +394,8 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 renderer.outputEncoding = THREE.sRGBEncoding
-// renderer.physicallyCorrectLights = true
 renderer.toneMapping = THREE.ReinhardToneMapping
 renderer.toneMappingExposure = 1
-
-// renderer.shadowMap.enabled = true
-// renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
 
 /**
@@ -439,7 +414,10 @@ const tick = () =>
     // Update controls
     // controls.update()
 
-    camera.lookAt(0,1,0)
+    //Animate camera
+    const scrollScale = scrollY/sizes.height
+    camera.position.y =  2.48 - (scrollScale*floorDistance)
+    camera.lookAt(0,1-(scrollScale*floorDistance),0)
 
 
     // Render
