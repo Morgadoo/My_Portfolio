@@ -3,11 +3,10 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
 import Stats from 'stats.js'
 // import * as dat from 'dat.gui'
 import gsap from 'gsap'
-
-import { RectAreaLightHelper } from 'three/examples/jsm/helpers/RectAreaLightHelper.js'
 
 
 
@@ -120,19 +119,28 @@ const loadingManager = new THREE.LoadingManager(
 
 const textureLoader = new THREE.TextureLoader(loadingManager)
 
-const texture_bake1 = textureLoader.load("/gltf/bake1.jpg")
+const texture_bake1 = textureLoader.load("gltf/bake1.jpg")
 texture_bake1.flipY = false
 texture_bake1.encoding = THREE.sRGBEncoding
+texture_bake1.minFilter = THREE.LinearFilter
 
-const texture_bake1_mask = textureLoader.load("/gltf/bake1_mask.jpg")
 
-const texture_bake2 = textureLoader.load("/gltf/bake2.jpg")
+
+// const texture_bake1_mask = textureLoader.load("gltf/bake1_mask.jpg")
+// texture_bake1_mask.minFilter = THREE.LinearFilter
+
+const texture_bake2 = textureLoader.load("gltf/bake2.jpg")
 texture_bake2.flipY = false
 texture_bake2.encoding = THREE.sRGBEncoding
+texture_bake2.minFilter = THREE.LinearFilter
 
-const texture_bake3 = textureLoader.load("/gltf/bake3.jpg")
+
+
+const texture_bake3 = textureLoader.load("gltf/bake3.jpg")
 texture_bake3.flipY = false
 texture_bake3.encoding = THREE.sRGBEncoding
+texture_bake3.minFilter = THREE.LinearFilter
+
 
 // const texture_color = textureLoader.load("/concrete/vjctbag_2K_Albedo.jpg")
 // const texture_ao = textureLoader.load("/concrete/vjctbag_2K_AO.jpg")
@@ -159,7 +167,7 @@ texture_bake3.encoding = THREE.sRGBEncoding
 // ])
 // environmentMAp.encoding = THREE.sRGBEncoding
 // scene.background = environmentMAp
-scene.background = new THREE.Color( 0x000000 )
+// scene.background = new THREE.Color( 0x111111 )
 // scene.environment = environmentMAp
 
 
@@ -175,12 +183,41 @@ dracoLoader.setDecoderPath('draco/')
 
 // GLTF Materials
 
-const  bake1Material = new THREE.MeshBasicMaterial({map: texture_bake1, alphaMap: texture_bake1_mask, transparent: true})
+const  bake1Material = new THREE.MeshBasicMaterial({ map: texture_bake1, side: THREE.FrontSide})
+const  bake1BackSideMaterial = new THREE.MeshBasicMaterial({color: 0x000000, side: THREE.BackSide})
 const  bake2Material = new THREE.MeshBasicMaterial({map: texture_bake2})
 const  bake3Material = new THREE.MeshBasicMaterial({map: texture_bake3})
 
 const lightBlueMaterial = new THREE.MeshBasicMaterial({color: 0x00B8FF})
 const lightWhiteMaterial = new THREE.MeshBasicMaterial({color: 0xFFFFFF})
+
+
+// OBJ Loader
+
+// const objLoader = new OBJLoader(loadingManager)
+
+// objLoader.load("obj/scene.obj",
+//     (obj) => {
+//         console.log(obj)
+        
+//         const lightBlueMesh = obj.children.find(child => child.name == "light_blue")
+//         const lightWhiteMesh = obj.children.find(child => child.name == "light_white")
+//         const planeMesh = obj.children.find(child => child.name == "Plane")
+//         const objectsMesh = obj.children.find(child => child.name == "objects")
+//         const lightsMesh = obj.children.find(child => child.name == "lights")
+
+//         lightBlueMesh.material = lightBlueMaterial
+//         lightWhiteMesh.material = lightWhiteMaterial
+//         planeMesh.material = bake1Material
+//         objectsMesh.material = bake2Material
+//         lightsMesh.material = bake3Material
+
+        
+//         scene.add(obj)
+
+//     })
+
+
 
 
 // GLTF Loader
@@ -194,53 +231,23 @@ gltfLoader.load(
 
         const lightBlueMesh = gltf.scene.children.find(child => child.name == "light_blue")
         const lightWhiteMesh = gltf.scene.children.find(child => child.name == "light_white")
-        const planeMesh = gltf.scene.children.find(child => child.name == "Plane")
+        const planeMesh = gltf.scene.children.find(child => child.name == "plane")
+        const planeBackSideMesh = gltf.scene.children.find(child => child.name == "plane_back")
         const objectsMesh = gltf.scene.children.find(child => child.name == "objects")
         const lightsMesh = gltf.scene.children.find(child => child.name == "lights")
 
         lightBlueMesh.material = lightBlueMaterial
         lightWhiteMesh.material = lightWhiteMaterial
         planeMesh.material = bake1Material
+        planeBackSideMesh.material = bake1BackSideMaterial
         objectsMesh.material = bake2Material
         lightsMesh.material = bake3Material
+
         
-        // const children = [...gltf.scene.children]
-    
-        // for( const child of children){
-
-            // if(child.name == "Plane"){
-            //     child.material = bake1Material
-
-            // }else if (child.name == "objects"){
-            //     child.material = bake2Material
-
-            // }else if (child.name == "light_blue"){
-            //     child.material = lightBlueMaterial
-            
-            // }else if (child.name == "light_white"){
-            //     child.material = lightWhiteMaterial
-
-            // }else {
-            //     child.material = bake3Material
-            // }
-        // }
-
-
-
+        // objectsMesh.geometry.drawRange(1,10)
         console.log(gltf.scene.children)
         scene.add(gltf.scene)
-
-        // updateMaterials()
     }
-    // () => {
-    //     console.log("success")
-    // },
-    // () => {
-    //     console.log("progress")
-    // },
-    // () => {
-    //     console.log("error")
-    // }
 )
 
 /**
@@ -402,12 +409,13 @@ window.addEventListener("dblclick", () => {
  */
 const renderer = new THREE.WebGLRenderer({
     canvas: canvas,
-    antialias: true
+    antialias: true,
+    alpha: true
 })
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-// renderer.physicallyCorrectLights = true
 renderer.outputEncoding = THREE.sRGBEncoding
+// renderer.physicallyCorrectLights = true
 renderer.toneMapping = THREE.ReinhardToneMapping
 renderer.toneMappingExposure = 1
 
