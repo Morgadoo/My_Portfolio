@@ -425,11 +425,19 @@ window.addEventListener("scroll", () => {
 // axesHelper.position.set(0, 0, 0)0
 // scene.add( axesHelper )
 
-const gridHelper = new THREE.GridHelper( 5, 10 )
+const gridHelper = new THREE.GridHelper( 5, 8, 0x898989,0x898989 )
 gridHelper.position.set(0,-0.05,0)
 gridHelper.rotation.y = Math.PI/4
-scene.add( gridHelper )
 
+const gridHelper2 = new THREE.GridHelper( 5, 8, 0x898989,0x898989 )
+gridHelper2.position.set(0,-0.05-floorDistance,0)
+gridHelper2.rotation.y = Math.PI/4
+
+const gridHelper3 = new THREE.GridHelper( 5, 8, 0x898989,0x898989 )
+gridHelper3.position.set(0,-0.05-floorDistance*2,0)
+gridHelper3.rotation.y = Math.PI/4
+
+scene.add( gridHelper, gridHelper2, gridHelper3 )
 
 /**
  * ------------------------------------------------------------------  Light
@@ -455,7 +463,7 @@ renderer.toneMappingExposure = 1
 /**
  * ------------------------------------------------------------------ Post Processing
  */
-const renderTarget = new THREE.WebGLRenderTarget(
+const renderTarget = new THREE.WebGLMultisampleRenderTarget(
     800,
     600,
     {
@@ -476,10 +484,10 @@ const renderPass = new RenderPass(scene,camera)
 effectComposer.addPass(renderPass)
 
 const bloomPass = new UnrealBloomPass()
-bloomPass.threshold = 0.25
-bloomPass.strength = 0.12
-bloomPass.radius = 0.2
-bloomPass.enabled = false
+bloomPass.threshold = 0.29  //0.25
+bloomPass.strength = 0.15    //0.15
+bloomPass.radius = 0.3
+// bloomPass.enabled = false
 
 effectComposer.addPass(bloomPass)
 
