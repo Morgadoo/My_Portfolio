@@ -25,6 +25,31 @@ const site = document.querySelector('html.mysite')
 // Scene
 const scene = new THREE.Scene()
 
+scene.traverse( disposeMaterial );
+scene.children.length = 0;
+
+// ------------------------------------------------------------------------------------------------------------------------------------
+const ENTIRE_SCENE = 0
+const BLOOM_SCENE = 1
+
+//Layers
+
+const bloomLayer = new THREE.Layers();
+bloomLayer.set( BLOOM_SCENE );
+
+
+const params = {
+    exposure: 1,
+    bloomStrength: 0.6,
+    bloomThreshold: 0,
+    bloomRadius: 0.3,
+    scene: 'Scene with Glow'
+};
+
+const darkMaterial = new THREE.MeshBasicMaterial( { color: 'black' } );
+const materials = {};
+
+//------------------------------------------------------------------------------------------------------------------------------------
 // Overlay
  const overlayGeometry = new THREE.PlaneBufferGeometry(2,2,1,1)
  const overlayMaterial = new THREE.ShaderMaterial({
@@ -48,7 +73,7 @@ const scene = new THREE.Scene()
 
 // Dat.gui
 
-// const gui = new dat.GUI({closed: true, width: 400})
+// const gui = new dat.GUI({closed: false, width: 400})
 
 
 
@@ -217,7 +242,9 @@ gltfLoader.load(
         const lightsMesh = gltf.scene.children.find(child => child.name == "lights")
 
         lightBlueMesh.material = lightBlueMaterial
+        lightBlueMesh.layers.enable( BLOOM_SCENE )
         lightWhiteMesh.material = lightWhiteMaterial
+        lightWhiteMesh.layers.enable( BLOOM_SCENE )
         planeMesh.material = bake1Material
         planeBackSideMesh.material = bake1BackSideMaterial
 
@@ -241,6 +268,7 @@ gltfLoader.load(
         plane2Mesh.position.y =+ -floorDistance
         plane2BackSideMesh.position.y =+ -floorDistance
         cube2.position.y = -floorDistance - offsetDistance + 0.5
+        cube2.layers.enable( BLOOM_SCENE );
 
 
         scene.add(plane2Mesh,plane2BackSideMesh,cube2)
@@ -257,6 +285,7 @@ gltfLoader.load(
         plane3Mesh.position.y =+ -floorDistance *  2
         plane3BackSideMesh.position.y =+ -floorDistance * 2
         cube3.position.y = -(floorDistance * 2) - offsetDistance + 0.5
+        cube3.layers.enable( BLOOM_SCENE );
 
         
         scene.add(plane3Mesh,plane3BackSideMesh,cube3)
@@ -296,13 +325,14 @@ const cursor = {
     x:0,
     y:0
 }
+
 window.addEventListener("mousemove", (event) => {
     cursor.x = event.clientX / sizes.width - 0.5
     cursor.y = event.clientY / sizes.height - 0.5
 
 
-    gsap.to(camera.position,{duration: 2, delay: 0.05, x:Math.cos(cursor.x * Math.PI/12)*9.5})
-    gsap.to(camera.position,{duration: 2, delay: 0.05, z:Math.sin(cursor.x * Math.PI/12)*9.5})
+    gsap.to(camera.position,{duration: 2, delay: 0.05, x:Math.cos(cursor.x * Math.PI/1)*9.5})
+    gsap.to(camera.position,{duration: 2, delay: 0.05, z:Math.sin(cursor.x * Math.PI/1)*9.5})
     // gsap.to(camera.position,{duration: 2, delay: 0.05, y:-cursor.y * 2 + 2})
 
 })
@@ -338,7 +368,11 @@ window.addEventListener('resize', () =>
     effectComposer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     effectComposer.setSize(sizes.width, sizes.height)
 
+    //Update FinalComposer
+    finalComposer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    finalComposer.setSize(sizes.width, sizes.height)
 
+    render();
 })
 
 window.addEventListener("dblclick", () => {
@@ -426,6 +460,7 @@ window.addEventListener("scroll", () => {
 const gridHelper = new THREE.GridHelper( 5, 8, 0x898989,0x898989 )
 gridHelper.position.set(0,-0.05,0)
 gridHelper.rotation.y = Math.PI/4
+gridHelper.materials
 
 const gridHelper2 = new THREE.GridHelper( 5, 8, 0x898989,0x898989 )
 gridHelper2.position.set(0,-0.05-floorDistance,0)
@@ -436,6 +471,7 @@ gridHelper3.position.set(0,-0.05-floorDistance*2,0)
 gridHelper3.rotation.y = Math.PI/4
 
 scene.add( gridHelper, gridHelper2, gridHelper3 )
+
 
 /**
  * ------------------------------------------------------------------  Light
@@ -471,23 +507,180 @@ const renderTarget = new THREE.WebGLMultisampleRenderTarget(
     }
 
 )
-
-
-const effectComposer = new EffectComposer(renderer, renderTarget)
-effectComposer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-effectComposer.setSize(sizes.width, sizes.height)
-
 const renderPass = new RenderPass(scene,camera)
-effectComposer.addPass(renderPass)
 
 const bloomPass = new UnrealBloomPass()
+bloomPass.threshold = params.bloomThreshold;
+bloomPass.strength = params.bloomStrength;
+bloomPass.radius = params.bloomRadius;
 
-bloomPass.threshold = 0.6 //0.25
-bloomPass.strength = 0.5    //0.15
-bloomPass.radius = 0.3
-// bloomPass.enabled = false
-
+const effectComposer = new EffectComposer(renderer, renderTarget)
+effectComposer.renderToScreen = false
+effectComposer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+effectComposer.setSize(sizes.width, sizes.height)
+effectComposer.addPass(renderPass)
 effectComposer.addPass(bloomPass)
+
+const finalPass = new ShaderPass(
+    new THREE.ShaderMaterial( {
+        uniforms: {
+            baseTexture: { value: null },
+            bloomTexture: { value: effectComposer.renderTarget2.texture }
+        },
+        vertexShader:`
+        varying vec2 vUv;
+
+			void main() {
+
+				vUv = uv;
+
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+			}`,
+        fragmentShader: `
+        uniform sampler2D baseTexture;
+		uniform sampler2D bloomTexture;
+
+			varying vec2 vUv;
+
+			void main() {
+
+				gl_FragColor = ( texture2D( baseTexture, vUv ) + vec4( 1.0 ) * texture2D( bloomTexture, vUv ) );
+
+			}`
+    } ), 'baseTexture'
+);
+
+finalPass.needsSwap = true;
+
+const finalComposer = new EffectComposer( renderer , renderTarget );
+finalComposer.addPass( renderPass );
+finalComposer.addPass( finalPass );
+
+render();
+
+
+//-------------
+// const raycaster = new THREE.Raycaster();
+
+// const mouse = new THREE.Vector2();
+
+// window.addEventListener( 'pointerdown', onPointerDown );
+
+// function onPointerDown( event ) {
+
+//     mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+//     mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+//     raycaster.setFromCamera( mouse, camera );
+//     const intersects = raycaster.intersectObjects( scene.children, false );
+//     if ( intersects.length > 0 ) {
+//         const object = intersects[ 0 ].object;
+//         console.log(object)
+//         // object.layers.toggle( BLOOM_SCENE );
+//         render();
+
+//     }
+
+// }
+
+//----------
+
+// gui.add( params, 'scene', [ 'Scene with Glow', 'Glow only', 'Scene only' ] ).onChange( function ( value ) {
+
+//     switch ( value ) 	{
+
+//         case 'Scene with Glow':
+//             effectComposer.renderToScreen = false;
+//             break;
+//         case 'Glow only':
+//             effectComposer.renderToScreen = true;
+//             break;
+//         case 'Scene only':
+//             // nothing to do
+//             break;
+
+//     }
+
+//     render();
+
+// } );
+
+
+function disposeMaterial( obj ) {
+
+    if ( obj.material ) {
+
+        obj.material.dispose();
+
+    }
+
+}
+
+function render() {
+
+    switch ( params.scene ) {
+
+        case 'Scene only':
+            renderer.render( scene, camera );
+            break;
+        case 'Glow only':
+            renderBloom( false );
+            break;
+        case 'Scene with Glow':
+        default:
+            // render scene with bloom
+            renderBloom( true );
+
+            // render the entire scene, then render bloom scene on top
+            finalComposer.render();
+            break;
+
+    }
+
+}
+
+
+function renderBloom( mask ) {
+
+    if ( mask === true ) {
+
+        scene.traverse( darkenNonBloomed );
+        effectComposer.render();
+        scene.traverse( restoreMaterial );
+
+    } else {
+
+        camera.layers.set( BLOOM_SCENE );
+        effectComposer.render();
+        camera.layers.set( ENTIRE_SCENE );
+
+    }
+
+}
+
+function darkenNonBloomed( obj ) {
+
+    if ( bloomLayer.test( obj.layers ) === false ) {  //obj.isMesh && bloomLayer.test( obj.layers ) === false
+
+        materials[ obj.uuid ] = obj.material;
+        obj.material = darkMaterial;
+
+    }
+
+}
+
+function restoreMaterial( obj ) {
+
+    if ( materials[ obj.uuid ] ) {
+
+        obj.material = materials[ obj.uuid ];
+        delete materials[ obj.uuid ];
+
+    }
+
+}
+
+
 
 /**
  * ------------------------------------------------------------------ Animate
@@ -514,7 +707,7 @@ const tick = () =>
 
     // Render
     // renderer.render(scene, camera)
-    effectComposer.render()
+    render()
 
     // Call tick again on the next frame
     window.requestAnimationFrame(tick)
