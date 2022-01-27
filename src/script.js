@@ -242,9 +242,7 @@ gltfLoader.load(
         const lightsMesh = gltf.scene.children.find(child => child.name == "lights")
 
         lightBlueMesh.material = lightBlueMaterial
-        lightBlueMesh.layers.enable( BLOOM_SCENE )
         lightWhiteMesh.material = lightWhiteMaterial
-        lightWhiteMesh.layers.enable( BLOOM_SCENE )
         planeMesh.material = bake1Material
         planeBackSideMesh.material = bake1BackSideMaterial
 
@@ -331,8 +329,8 @@ window.addEventListener("mousemove", (event) => {
     cursor.y = event.clientY / sizes.height - 0.5
 
 
-    gsap.to(camera.position,{duration: 2, delay: 0.05, x:Math.cos(cursor.x * Math.PI/1)*9.5})
-    gsap.to(camera.position,{duration: 2, delay: 0.05, z:Math.sin(cursor.x * Math.PI/1)*9.5})
+    gsap.to(camera.position,{duration: 2, delay: 0.05, x:Math.cos(cursor.x * Math.PI/12)*9.5})
+    gsap.to(camera.position,{duration: 2, delay: 0.05, z:Math.sin(cursor.x * Math.PI/12)*9.5})
     // gsap.to(camera.position,{duration: 2, delay: 0.05, y:-cursor.y * 2 + 2})
 
 })
@@ -701,7 +699,7 @@ const tick = () =>
     //Animate camera
     const scrollScale = scrollY/sizes.height
     // camera.position.y =  2.48 - (scrollScale*floorDistance)
-    camera.position.y += ((2.48 - (scrollScale*floorDistance)) - camera.position.y)*0.1
+    camera.position.y += ((2.48 - (scrollScale*floorDistance)) - camera.position.y)*0.125
     camera.lookAt(0,1-(scrollScale*floorDistance),0)
 
 
