@@ -20,6 +20,7 @@ import { Mesh } from 'three'
  */
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
+const site = document.querySelector('body.mysite')
 
 // Scene
 const scene = new THREE.Scene()
@@ -342,13 +343,13 @@ window.addEventListener('resize', () =>
 
 })
 
-// window.addEventListener("dblclick", () => {
-//     if (!document.fullscreenElement){
-//         canvas.requestFullscreen()
-//     }else{
-//         document.exitFullscreen()
-//     }
-// })
+window.addEventListener("dblclick", () => {
+    if (!document.fullscreenElement){
+        site.requestFullscreen()
+    }else{
+        document.exitFullscreen()
+    }
+})
 
 /**
  * ------------------------------------------------------------------ Scroll
