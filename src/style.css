@@ -5,6 +5,7 @@
 
 html{
     background: #000000;
+    scroll-behavior: smooth;
 }
 
 /* html,
@@ -43,15 +44,25 @@ body{
     align-items: center;
     height: 100vh;
     position: relative;
-    font-family: 'Cabin', sans-serif;
+    font-family: Helvetica, sans-serif;
     color: #c0c0c0;
     text-transform: uppercase;
-    font-size: 6vmin;
+    font-size: 5.5vmin;
     padding-left: 10%;
     padding-right: 10%;
+    /* align-content: center; */
 }
 
-section:nth-child(odd)
+/* section:nth-child(odd)
 {
     justify-content: flex-end;
-}
+} */
+
+
+.title {
+    position: relative;
+    text-align: center;
+    align-items: center;
+    top: -3em;
+    width: 100%;
+} 

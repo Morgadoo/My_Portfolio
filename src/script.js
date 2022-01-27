@@ -3,7 +3,10 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
+import {UnrealBloomPass} from 'three/examples/jsm/postprocessing/UnrealBloomPass.js'
+import {BloomPass} from 'three/examples/jsm/postprocessing/BloomPass.js'
 import Stats from 'stats.js'
 // import * as dat from 'dat.gui'
 import gsap from 'gsap'
@@ -125,6 +128,11 @@ texture_bake1.flipY = false
 texture_bake1.encoding = THREE.sRGBEncoding
 texture_bake1.minFilter = THREE.LinearFilter
 
+const texture_bake1_1 = textureLoader.load("gltf/bake1_1.jpg")
+texture_bake1_1.flipY = false
+texture_bake1_1.encoding = THREE.sRGBEncoding
+texture_bake1_1.minFilter = THREE.LinearFilter
+
 
 
 const texture_bake1_mask = textureLoader.load("gltf/bake1_mask.jpg")
@@ -178,6 +186,7 @@ dracoLoader.setDecoderPath('draco/')
 // GLTF Materials
 
 const  bake1Material = new THREE.MeshBasicMaterial({ map: texture_bake1, alphaMap:texture_bake1_mask, side: THREE.FrontSide, transparent: true})
+const  bake1_1Material = new THREE.MeshBasicMaterial({ map: texture_bake1_1, alphaMap:texture_bake1_mask, side: THREE.FrontSide, transparent: true})
 const  bake1BackSideMaterial = new THREE.MeshBasicMaterial({color: 0x000000, alphaMap:texture_bake1_mask, side: THREE.BackSide, transparent: true})
 const  bake2Material = new THREE.MeshBasicMaterial({map: texture_bake2})
 const  bake3Material = new THREE.MeshBasicMaterial({map: texture_bake3})
@@ -225,14 +234,14 @@ gltfLoader.load(
         const plane2BackSideMesh = planeMesh.clone()
         const cube2Mesh = new THREE.BoxBufferGeometry(1,1,1)
 
-        plane2Mesh.material = bake1Material
+        plane2Mesh.material = bake1_1Material
         plane2BackSideMesh.material = bake1BackSideMaterial
 
-        const cube2 = new Mesh(cube2Mesh,lightBlueMaterial)
+        window.cube2 = new Mesh(cube2Mesh,lightBlueMaterial)
 
         plane2Mesh.position.y =+ -floorDistance
         plane2BackSideMesh.position.y =+ -floorDistance
-        cube2.position.y = -floorDistance + offsetDistance + 0.5
+        cube2.position.y = -floorDistance - offsetDistance + 0.5
 
 
         scene.add(plane2Mesh,plane2BackSideMesh,cube2)
@@ -241,21 +250,20 @@ gltfLoader.load(
         const plane3Mesh = planeMesh.clone()
         const plane3BackSideMesh = planeMesh.clone()
 
-        plane3Mesh.material = bake1Material
+        plane3Mesh.material = bake1_1Material
         plane3BackSideMesh.material = bake1BackSideMaterial
 
-        const cube3 = new Mesh(cube2Mesh,lightBlueMaterial)
+        window.cube3 = new Mesh(cube2Mesh,lightBlueMaterial)
 
         plane3Mesh.position.y =+ -floorDistance *  2
         plane3BackSideMesh.position.y =+ -floorDistance * 2
-        cube3.position.y = -(floorDistance * 2) + offsetDistance + 0.5
+        cube3.position.y = -(floorDistance * 2) - offsetDistance + 0.5
 
         
         scene.add(plane3Mesh,plane3BackSideMesh,cube3)
 
-        console.log(gltf.scene.children.name)
+        console.log(gltf.scene.children)
         scene.add(gltf.scene)
-        
     }
 )
 
@@ -294,8 +302,8 @@ window.addEventListener("mousemove", (event) => {
     cursor.y = event.clientY / sizes.height - 0.5
 
 
-    gsap.to(camera.position,{duration: 2, delay: 0.05, x:Math.cos(cursor.x * Math.PI/6)*9.5})
-    gsap.to(camera.position,{duration: 2, delay: 0.05, z:Math.sin(cursor.x * Math.PI/6)*9.5})
+    gsap.to(camera.position,{duration: 2, delay: 0.05, x:Math.cos(cursor.x * Math.PI/12)*9.5})
+    gsap.to(camera.position,{duration: 2, delay: 0.05, z:Math.sin(cursor.x * Math.PI/12)*9.5})
     // gsap.to(camera.position,{duration: 2, delay: 0.05, y:-cursor.y * 2 + 2})
 
 })
@@ -321,33 +329,49 @@ window.addEventListener('resize', () =>
     // Update camera
     camera.aspect = sizes.width / sizes.height
     
-    if (sizes.width < 800){
-        camera.fov = 40
-    }else {
-        camera.fov = 25
-    }
     camera.updateProjectionMatrix()
 
     // Update renderer
     renderer.setSize(sizes.width, sizes.height)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
+    //Update effect composer
+    effectComposer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    effectComposer.setSize(sizes.width, sizes.height)
+
+
 })
 
-window.addEventListener("dblclick", () => {
-    if (!document.fullscreenElement){
-        canvas.requestFullscreen()
-    }else{
-        document.exitFullscreen()
-    }
-})
+// window.addEventListener("dblclick", () => {
+//     if (!document.fullscreenElement){
+//         canvas.requestFullscreen()
+//     }else{
+//         document.exitFullscreen()
+//     }
+// })
 
-// Scroll
+/**
+ * ------------------------------------------------------------------ Scroll
+ */
 
 let scrollY = window.scrollY
+let currentSection = 0
 
 window.addEventListener("scroll", () => {
     scrollY = window.scrollY
+    const newSection = Math.round(scrollY/sizes.height)
+    
+    if (newSection != currentSection){
+        currentSection = newSection
+        console.log(newSection)
 
+        if(newSection == 1){
+            gsap.to(cube2.rotation,{duration: 2, delay: 0.5, ease: "power2.inOut", y: "+=3.14"})
+        }else if (newSection == 2){
+            gsap.to(cube3.rotation,{duration: 2, delay: 0.5, ease: "power2.inOut", y: "+=3.14"})
+
+        }
+    }
 })
 
 
@@ -363,18 +387,47 @@ window.addEventListener("scroll", () => {
 /**
  * ------------------------------------------------------------------ Geometry
  */
+//Particles
 
+// const particlesCount = 200
 
+// const particlePositions = new Float32Array(particlesCount * 3)
+
+// for (let i = 0; i < particlesCount; i++){
+
+//     particlePositions[i * 3 + 0] = (Math.random() - 0.5) * 5
+//     particlePositions[i * 3 + 1] = (Math.random() - 0.5) * 0.01 -0.1
+//     particlePositions[i * 3 + 2] = (Math.random() - 0.5) * 5
+
+// }
+
+// const particlesGeo = new THREE.BufferGeometry()
+// particlesGeo.setAttribute("position", new THREE.BufferAttribute(particlePositions,3))
+
+// const particlesMat = new THREE.PointsMaterial({
+//     color: 0xc0c0c0,
+//     sizeAttenuation:true,
+//     size: 0.03
+// })
+
+// const particles = new THREE.Points(particlesGeo,particlesMat)
+
+// scene.add(particles)
 
 
 /**
- * Helpers
+ * ------------------------------------------------------------------ Helpers
  */
 
 //Axes Helper
 // const axesHelper = new THREE.AxesHelper( 1 );
 // axesHelper.position.set(0, 0, 0)0
 // scene.add( axesHelper )
+
+const gridHelper = new THREE.GridHelper( 5, 10 )
+gridHelper.position.set(0,-0.05,0)
+gridHelper.rotation.y = Math.PI/4
+scene.add( gridHelper )
 
 
 /**
@@ -399,6 +452,37 @@ renderer.toneMappingExposure = 1
 
 
 /**
+ * ------------------------------------------------------------------ Post Processing
+ */
+const renderTarget = new THREE.WebGLRenderTarget(
+    800,
+    600,
+    {
+        minFilter: THREE.LinearFilter,
+        magFilter: THREE.LinearFilter,
+        format: THREE.RGBAFormat,
+        encoding: THREE.sRGBEncoding
+    }
+
+)
+
+
+const effectComposer = new EffectComposer(renderer, renderTarget)
+effectComposer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+effectComposer.setSize(sizes.width, sizes.height)
+
+const renderPass = new RenderPass(scene,camera)
+effectComposer.addPass(renderPass)
+
+const bloomPass = new UnrealBloomPass()
+bloomPass.threshold = 0.25
+bloomPass.strength = 0.12
+bloomPass.radius = 0.2
+bloomPass.enabled = false
+
+effectComposer.addPass(bloomPass)
+
+/**
  * ------------------------------------------------------------------ Animate
  */
 
@@ -416,12 +500,14 @@ const tick = () =>
 
     //Animate camera
     const scrollScale = scrollY/sizes.height
-    camera.position.y =  2.48 - (scrollScale*floorDistance)
+    // camera.position.y =  2.48 - (scrollScale*floorDistance)
+    camera.position.y += ((2.48 - (scrollScale*floorDistance)) - camera.position.y)*0.1
     camera.lookAt(0,1-(scrollScale*floorDistance),0)
 
 
     // Render
-    renderer.render(scene, camera)
+    // renderer.render(scene, camera)
+    effectComposer.render()
 
     // Call tick again on the next frame
     window.requestAnimationFrame(tick)
