@@ -5,8 +5,8 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js'
 import {UnrealBloomPass} from 'three/examples/jsm/postprocessing/UnrealBloomPass.js'
-import {BloomPass} from 'three/examples/jsm/postprocessing/BloomPass.js'
 import Stats from 'stats.js'
 // import * as dat from 'dat.gui'
 import gsap from 'gsap'
@@ -24,8 +24,6 @@ const site = document.querySelector('html.mysite')
 
 // Scene
 const scene = new THREE.Scene()
-
-
 
 // Overlay
  const overlayGeometry = new THREE.PlaneBufferGeometry(2,2,1,1)
@@ -238,7 +236,7 @@ gltfLoader.load(
         plane2Mesh.material = bake1_1Material
         plane2BackSideMesh.material = bake1BackSideMaterial
 
-        window.cube2 = new Mesh(cube2Mesh,lightBlueMaterial)
+        window.cube2 = new Mesh(cube2Mesh,lightWhiteMaterial)
 
         plane2Mesh.position.y =+ -floorDistance
         plane2BackSideMesh.position.y =+ -floorDistance
@@ -444,7 +442,6 @@ scene.add( gridHelper, gridHelper2, gridHelper3 )
  */
 
 
-
 /**
  * ------------------------------------------------------------------ Renderer
  */
@@ -484,8 +481,9 @@ const renderPass = new RenderPass(scene,camera)
 effectComposer.addPass(renderPass)
 
 const bloomPass = new UnrealBloomPass()
-bloomPass.threshold = 0.29  //0.25
-bloomPass.strength = 0.15    //0.15
+
+bloomPass.threshold = 0.6 //0.25
+bloomPass.strength = 0.5    //0.15
 bloomPass.radius = 0.3
 // bloomPass.enabled = false
 
