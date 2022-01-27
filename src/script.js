@@ -20,7 +20,7 @@ import { Mesh } from 'three'
  */
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
-const site = document.querySelector('body.mysite')
+const site = document.querySelector('html.mysite')
 
 // Scene
 const scene = new THREE.Scene()
