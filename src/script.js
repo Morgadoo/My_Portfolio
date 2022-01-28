@@ -301,21 +301,6 @@ gltfLoader.load(
     height: window.innerHeight
 }
 
-window.addEventListener('resize', () =>
-{
-    // Update sizes
-    sizes.width = window.innerWidth
-    sizes.height = window.innerHeight
-
-    // Update camera
-    camera.aspect = sizes.width / sizes.height
-    camera.updateProjectionMatrix()
-
-    // Update renderer
-    renderer.setSize(sizes.width, sizes.height)
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-})
-
 /**
  * ------------------------------------------------------------------ Cursor
  */
@@ -340,7 +325,14 @@ window.addEventListener("mousemove", (event) => {
  */
 
 // Base camera
-const camera = new THREE.PerspectiveCamera(25, sizes.width / sizes.height, 0.1, 100)
+let camfov = 25
+if (sizes.width < 800){
+    camfov = 35
+}else {
+    camfov = 25
+}
+
+const camera = new THREE.PerspectiveCamera(camfov , sizes.width / sizes.height, 0.1, 100)
 camera.rotation.y = Math.PI/2
 camera.position.set(9.91, 2.48, 0)
 camera.lookAt(0,1,0)
@@ -355,8 +347,13 @@ window.addEventListener('resize', () =>
 
     // Update camera
     camera.aspect = sizes.width / sizes.height
-    
     camera.updateProjectionMatrix()
+
+    if (sizes.width < 800){
+        camera.fov = 35
+    }else {
+        camera.fov = 25
+    }
 
     // Update renderer
     renderer.setSize(sizes.width, sizes.height)
@@ -686,6 +683,8 @@ function restoreMaterial( obj ) {
 
 const clock = new THREE.Clock()
 let lastElapsedTime = 0
+// let looky = 1
+const scrollSpeed = 5
 
 const tick = () =>
 {
@@ -698,8 +697,10 @@ const tick = () =>
 
     //Animate camera
     const scrollScale = scrollY/sizes.height
-    // camera.position.y =  2.48 - (scrollScale*floorDistance)
-    camera.position.y += ((2.48 - (scrollScale*floorDistance)) - camera.position.y)*0.125
+    const valuey = ((2.48 - (scrollScale*floorDistance)) - camera.position.y)*deltaTime * scrollSpeed
+    // looky += ((1-(scrollScale*floorDistance)) - (camera.position.y-1.48))* deltaTime * scrollSpeed
+
+    camera.position.y += valuey
     camera.lookAt(0,1-(scrollScale*floorDistance),0)
 
 
