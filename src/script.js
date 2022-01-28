@@ -491,9 +491,9 @@ renderer.toneMappingExposure = 1
 /**
  * ------------------------------------------------------------------ Post Processing
  */
-const renderTarget = new THREE.WebGLMultisampleRenderTarget(
-    800,
-    600,
+const renderTarget = new THREE.WebGLMultisampleRenderTarget( //WebGLRenderTarget
+    sizes.width,
+    sizes.height,
     {
         minFilter: THREE.LinearFilter,
         magFilter: THREE.LinearFilter,
@@ -509,7 +509,7 @@ bloomPass.threshold = params.bloomThreshold;
 bloomPass.strength = params.bloomStrength;
 bloomPass.radius = params.bloomRadius;
 
-const effectComposer = new EffectComposer(renderer, renderTarget)
+const effectComposer = new EffectComposer(renderer) // renderTarget
 effectComposer.renderToScreen = false
 effectComposer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 effectComposer.setSize(sizes.width, sizes.height)
@@ -697,12 +697,15 @@ const tick = () =>
 
     //Animate camera
     const scrollScale = scrollY/sizes.height
-    const valuey = ((2.48 - (scrollScale*floorDistance)) - camera.position.y)*deltaTime * scrollSpeed
+    let valuey = ((2.48 - (scrollScale*floorDistance)) - camera.position.y)*deltaTime * scrollSpeed
     // looky += ((1-(scrollScale*floorDistance)) - (camera.position.y-1.48))* deltaTime * scrollSpeed
 
+    if (valuey > 1){
+        console.log(valuey)
+        valuey = 0
+    } 
     camera.position.y += valuey
     camera.lookAt(0,1-(scrollScale*floorDistance),0)
-
 
     // Render
     // renderer.render(scene, camera)
