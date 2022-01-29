@@ -491,7 +491,16 @@ renderer.toneMappingExposure = 1
 /**
  * ------------------------------------------------------------------ Post Processing
  */
-const renderTarget = new THREE.WebGLMultisampleRenderTarget( //WebGLRenderTarget
+let renderTargetClass = null
+
+if(renderer.capabilities.isWebGL2){
+    renderTargetClass = THREE.WebGLMultisampleRenderTarget
+}else{
+    renderTargetClass = THREE.WebGLRenderTarget
+}
+
+
+const renderTarget = new renderTargetClass( //WebGLRenderTarget
     sizes.width,
     sizes.height,
     {
