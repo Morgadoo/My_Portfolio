@@ -7,7 +7,7 @@ export default class Sizes{
         this.aspectRatio = this.width / this.height
 
     }
-    updateSize(camera, renderer){
+    updateSize(camera, renderer, effectComposer, finalComposer){
 
         // Update sizes
         this.width = window.innerWidth
@@ -29,12 +29,12 @@ export default class Sizes{
         renderer.setPixelRatio(this.pixelRatio)
 
         // //Update effect composer
-        // effectComposer.setPixelRatio(this.pixelRatio)
-        // effectComposer.setSize(this.width, this.height)
+        effectComposer.setPixelRatio(this.pixelRatio)
+        effectComposer.setSize(this.width, this.height)
 
         // //Update FinalComposer
-        // finalComposer.setPixelRatio(this.pixelRatio)
-        // finalComposer.setSize(this.width, this.height)
+        finalComposer.setPixelRatio(this.pixelRatio)
+        finalComposer.setSize(this.width, this.height)
 
         console.log("Update resize")
     }

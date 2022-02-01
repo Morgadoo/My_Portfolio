@@ -2,7 +2,7 @@ import * as THREE from 'three'
 
 export default class Animate{
     
-    constructor(scene, camera, renderer, floorDistance){
+    constructor(scene, camera, renderer, floorDistance, render){
 
         const clock = new THREE.Clock()
         let lastElapsedTime = 0
@@ -18,15 +18,16 @@ export default class Animate{
             const scrollScale = window.scrollY/window.innerHeight
             let valuey = ((2.48 - (scrollScale*floorDistance)) - camera.position.y) * deltaTime * scrollSpeed
 
-            if (valuey >= 1){
+            if (valuey >= 10){
                 console.log(valuey)
-                valuey = -1         // window.location.reload()
+                window.location.reload()
             } 
             camera.position.y += valuey
             camera.lookAt(0,1-(scrollScale*floorDistance),0)
 
             // Render
-            renderer.render(scene, camera)
+            // renderer.render(scene, camera)
+            render()
 
             // Call tick again on the next frame
             window.requestAnimationFrame(tick)

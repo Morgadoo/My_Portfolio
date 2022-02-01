@@ -6,22 +6,9 @@ import { Mesh } from 'three'
 
 export default class LoaderManeger{
     
-    constructor(scene, overlayMaterial){
+    constructor(scene, overlayMaterial, BLOOM_SCENE){
         
         const loadingBarElement = document.querySelector(".loading_bar")
-
-        // loadingManager.onStart = () =>{
-        //     console.log("onStart")
-        // }
-        // loadingManager.onLoad = () =>{
-        //     console.log("onLoad")
-        // }
-        // loadingManager.onProgress = () =>{
-        //     console.log("onProgress")
-        // }
-        // loadingManager.onError = () =>{
-        //     console.log("onError")
-        // }    
 
         const loadingManager = new THREE.LoadingManager(
             () => {
@@ -169,7 +156,7 @@ export default class LoaderManeger{
                 plane2Mesh.position.y =+ -floorDistance
                 plane2BackSideMesh.position.y =+ -floorDistance
                 cube2.position.y = -floorDistance - offsetDistance + 0.5
-                // cube2.layers.enable( BLOOM_SCENE );
+                cube2.layers.enable( BLOOM_SCENE );
 
 
                 scene.add(plane2Mesh,plane2BackSideMesh,cube2)
@@ -186,7 +173,7 @@ export default class LoaderManeger{
                 plane3Mesh.position.y =+ -floorDistance *  2
                 plane3BackSideMesh.position.y =+ -floorDistance * 2
                 cube3.position.y = -(floorDistance * 2) - offsetDistance + 0.5
-                // cube3.layers.enable( BLOOM_SCENE );
+                cube3.layers.enable( BLOOM_SCENE );
 
                 
                 scene.add(plane3Mesh,plane3BackSideMesh,cube3)
