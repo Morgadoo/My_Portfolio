@@ -39,6 +39,19 @@ export default class Main{
         const scene = new THREE.Scene()
         scene.traverse( disposeMaterial );
         scene.children.length = 0;
+        // if (scene.children[0].material.type != "ShaderMaterial")
+        
+        //Parameters
+        const params = {
+        exposure: 1,
+        bloomStrength: 0.6,
+        bloomThreshold: 0,
+        bloomRadius: 0.3,
+        scene: 'Scene with Glow',
+        floorDistance : 4
+    }
+        // Overlay
+        const overlay = new Overlay(scene, params.floorDistance)
 
         //Layers
         const ENTIRE_SCENE = 0
@@ -49,19 +62,6 @@ export default class Main{
 
         const darkMaterial = new THREE.MeshBasicMaterial( { color: 'black' } )
         const materials = {}
-
-        //Parameters
-        const params = {
-            exposure: 1,
-            bloomStrength: 0.6,
-            bloomThreshold: 0,
-            bloomRadius: 0.3,
-            scene: 'Scene with Glow',
-            floorDistance : 4
-        }
-
-        // Overlay
-        const overlay = new Overlay(scene)
 
         //Dat.gui
         // this.datgui = new DatGui()
@@ -74,7 +74,7 @@ export default class Main{
         //Sizes
         this.sizes = new Sizes()
         window.addEventListener('resize', () => {
-            this.sizes.updateSize(camera, renderer, effectComposer, finalComposer) // effectComposer, finalComposer
+            this.sizes.updateSize(camera, renderer, effectComposer, finalComposer)
         })
 
         window.addEventListener("dblclick", () => {
@@ -108,7 +108,7 @@ export default class Main{
         
         //Renderer
         const renderer = new Renderer(canvas,this.sizes.width,this.sizes.height, this.sizes.pixelRatio)
-
+        // console.log(scene.children[0].material.type = ShaderMaterial)
         //Post Process
 
         let renderTargetClass = null
@@ -207,9 +207,7 @@ export default class Main{
 
 
         function disposeMaterial( obj ) {
-
             if ( obj.material ) {
-
                 obj.material.dispose();
 
             }
@@ -243,11 +241,11 @@ export default class Main{
         function renderBloom( mask ) {
 
             if ( mask === true ) {
-
+                
                 scene.traverse( darkenNonBloomed );
                 effectComposer.render();
                 scene.traverse( restoreMaterial );
-
+                
             } else {
 
                 camera.layers.set( BLOOM_SCENE );
@@ -261,10 +259,8 @@ export default class Main{
         function darkenNonBloomed( obj ) {
 
             if ( bloomLayer.test( obj.layers ) === false ) {  //obj.isMesh && bloomLayer.test( obj.layers ) === false
-
                 materials[ obj.uuid ] = obj.material;
                 obj.material = darkMaterial;
-
             }
 
         }
@@ -279,8 +275,6 @@ export default class Main{
             }
 
         }
-
-
 
 
         //Animate
