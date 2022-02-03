@@ -2,7 +2,7 @@ import * as THREE from 'three'
 
 export default class Animate{
     
-    constructor(scene, camera, renderer, floorDistance, render){
+    constructor(scene, camera, renderer, floorDistance){
 
         const clock = new THREE.Clock()
         let lastElapsedTime = 0
@@ -26,8 +26,7 @@ export default class Animate{
             camera.lookAt(0,1-(scrollScale*floorDistance),0)
 
             // Render
-            // renderer.render(scene, camera)
-            render()
+            renderer.render(scene, camera)
 
             // Call tick again on the next frame
             window.requestAnimationFrame(tick)
