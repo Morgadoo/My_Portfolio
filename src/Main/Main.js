@@ -1,5 +1,4 @@
 import * as THREE from 'three'
-// import * as dat from 'dat.gui'
 
 import Animate from './Animate'
 import Camera from './Camera'
@@ -9,7 +8,6 @@ import Light from './Light'
 import LoaderManeger from './LoaderManeger'
 import Renderer from './Renderer'
 import Scroll from './Scroll'
-import DatGui from './Utils/DatGui'
 import Helpers from './Utils/Helpers'
 import Sizes from "./Utils/Sizes"
 import Stats from './Utils/Stats'
