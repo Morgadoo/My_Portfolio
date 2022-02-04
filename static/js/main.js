@@ -147,17 +147,6 @@
 							leave:		function() { $(this).addClass('inactive'); }
 						});
 
-				// Contact.
-					$('#contact')
-						.scrollex({
-							top:		'50%',
-							delay:		50,
-							initialize:	function() { $(this).addClass('inactive'); },
-							terminate:	function() { $(this).removeClass('inactive'); },
-							enter:		function() { $(this).removeClass('inactive'); },
-							leave:		function() { $(this).addClass('inactive'); }
-						});
-
 			};
 
 			var off = function() {
@@ -198,10 +187,10 @@
 				resizeTimeout = setTimeout(function() {
 
 					// Update scrolly links.
-						$('a[href^="#"]').scrolly({
-							speed: 1500,
-							offset: $header.outerHeight() - 1
-						});
+						// $('a[href^="#"]').scrolly({
+						// 	speed: 1500,
+						// 	offset: $header.outerHeight() - 1
+						// });
 
 					// Re-enable animations/transitions.
 						setTimeout(function() {
