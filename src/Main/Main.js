@@ -47,12 +47,13 @@ export default class Main{
 
 
         // Loader Maneger
-        this.loaderManeger = new LoaderManeger(scene, overlay.overlayMaterial)
+        const loaderManeger = new LoaderManeger(scene, overlay.overlayMaterial)
 
+       
         //Sizes
-        this.sizes = new Sizes()
+        const sizes = new Sizes()
         window.addEventListener('resize', () => {
-            this.sizes.updateSize(camera, renderer)
+            sizes.updateSize(camera, renderer.renderer)
         })
 
         window.addEventListener("dblclick", () => {
@@ -64,15 +65,15 @@ export default class Main{
         })
 
         //Camera
-        const camera = new Camera(this.sizes.width,this.sizes.height,scene)
+        const camera = new Camera(sizes.width, sizes.height, scene)
 
         //Controls
-        this.controls = new Controls(camera, this.sizes.width, this.sizes.height)
+        const controls = new Controls(camera, sizes.width, sizes.height)
 
         //Scroll
-        this.scroll = new Scroll(this.sizes.height)
+        const scroll = new Scroll(sizes.height)
         window.addEventListener("scroll", () => {
-            this.scroll.updateScroll(this.sizes.height)
+            scroll.updateScroll(sizes.height)
         })
 
         //Geometry
@@ -85,10 +86,10 @@ export default class Main{
         // this.light = new Light(scene)
         
         //Renderer
-        const renderer = new Renderer(canvas,this.sizes.width,this.sizes.height, this.sizes.pixelRatio)    
+        const renderer = new Renderer(canvas, sizes.width, sizes.height, sizes.pixelRatio)    
 
         //Animate
-        this.animate = new Animate(scene, camera, renderer, params.floorDistance)
+        const animate = new Animate(scene, camera, renderer.renderer, params.floorDistance)
 
         //Stats
         const stats = new Stats()

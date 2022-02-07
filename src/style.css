@@ -38,6 +38,16 @@ html{
     transform: scaleX(0);
 }
 
+
+.label {
+    color: rgb(255, 0, 0);
+    font-family: sans-serif;
+    font-size: 2em;
+    padding: 2px;
+    background: rgba( 0, 0, 0, .6 );
+	z-index: 1;
+}
+
 /* ----------------------------------------------------------------------------------------- */
 
 @import url("./css/SourceSansPro.css");
