@@ -17,7 +17,9 @@ export default class LoaderManeger{
                     gsap.to(overlayMaterial.uniforms.uAlpha, {duration: 1, value:0})
                     loadingBarElement.style.transform = ""
                     loadingBarElement.classList.add("ended")
-
+                    gsap.delayedCall(1, () => {
+                        overlayMaterial.uniforms.Flip = -1
+                    })
                 })
         
             },
@@ -146,35 +148,16 @@ export default class LoaderManeger{
                 //Scene 2
                 const plane2Mesh = planeMesh.clone()
                 const plane2BackSideMesh = planeMesh.clone()
-                const cube2Mesh = new THREE.BoxBufferGeometry(1,1,1)
 
                 plane2Mesh.material = bake1_1Material
                 plane2BackSideMesh.material = bake1BackSideMaterial
 
-                window.cube2 = new Mesh(cube2Mesh,lightWhiteMaterial)
-
                 plane2Mesh.position.y =+ -floorDistance
                 plane2BackSideMesh.position.y =+ -floorDistance
-                cube2.position.y = -floorDistance - offsetDistance + 0.5
 
 
-                scene.add(plane2Mesh,plane2BackSideMesh,cube2)
+                scene.add(plane2Mesh,plane2BackSideMesh)
 
-                //Scene 3
-                const plane3Mesh = planeMesh.clone()
-                const plane3BackSideMesh = planeMesh.clone()
-
-                plane3Mesh.material = bake1_1Material
-                plane3BackSideMesh.material = bake1BackSideMaterial
-
-                window.cube3 = new Mesh(cube2Mesh,lightBlueMaterial)
-
-                plane3Mesh.position.y =+ -floorDistance *  2
-                plane3BackSideMesh.position.y =+ -floorDistance * 2
-                cube3.position.y = -(floorDistance * 2) - offsetDistance + 0.5
-
-                
-                scene.add(plane3Mesh,plane3BackSideMesh,cube3)
 
                 console.log(gltf.scene.children)
                 scene.add(gltf.scene)

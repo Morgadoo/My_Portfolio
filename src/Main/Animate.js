@@ -2,11 +2,14 @@ import * as THREE from 'three'
 
 export default class Animate{
     
-    constructor(scene, camera, renderer, floorDistance){
+    constructor(scene, camera, renderer, floorDistance, wireframe, particles){
 
         const clock = new THREE.Clock()
         let lastElapsedTime = 0
         const scrollSpeed = 5
+
+        const SEPARATION = 0.3, AMOUNTX = 50, AMOUNTY = 50
+
 
         const tick = () =>
         {
@@ -24,6 +27,37 @@ export default class Animate{
             } 
             camera.position.y += valuey
             camera.lookAt(0,1-(scrollScale*floorDistance),0)
+
+            //Animate wireframe
+            wireframe.rotation.y += 0.001;
+
+            //Animate Particles
+
+            const positions = particles.geometry.attributes.position.array;
+			const scales = particles.geometry.attributes.scale.array;
+
+            let i = 0, j = 0;
+
+            for ( let ix = 0; ix < AMOUNTX; ix ++ ) {
+
+                for ( let iy = 0; iy < AMOUNTY; iy ++ ) {
+
+                    positions[ i + 1 ] = ( Math.sin( ( ix + lastElapsedTime*3 ) * 0.3 ) * 0.2 ) +
+                                    ( Math.sin( ( iy + lastElapsedTime*3 ) * 0.5 ) * 0.2 ) - 8;
+
+                    scales[ j ] = ( Math.sin( ( ix + lastElapsedTime*3 ) * 0.3 ) + 1 ) * 0.2 +
+                                    ( Math.sin( ( iy + lastElapsedTime*3 ) * 0.5 ) + 1 ) * 0.2;
+
+                    i += 3;
+                    j ++;
+
+                }
+
+            }
+
+            particles.geometry.attributes.position.needsUpdate = true;
+            particles.geometry.attributes.scale.needsUpdate = true;
+
 
             // Render
             renderer.render(scene, camera)

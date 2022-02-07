@@ -64,6 +64,7 @@ export default class Main{
             }
         })
 
+
         //Camera
         const camera = new Camera(sizes.width, sizes.height, scene)
 
@@ -77,7 +78,7 @@ export default class Main{
         })
 
         //Geometry
-        // this.geometry = new Geometry(scene)
+        const geometry = new Geometry(scene)
 
         //Helpers
         // this.helpers = new Helpers(scene, params.floorDistance)
@@ -89,7 +90,7 @@ export default class Main{
         const renderer = new Renderer(canvas, sizes.width, sizes.height, sizes.pixelRatio)    
 
         //Animate
-        const animate = new Animate(scene, camera, renderer.renderer, params.floorDistance)
+        const animate = new Animate(scene, camera, renderer.renderer, params.floorDistance, geometry.wireframe, geometry.particles)
 
         //Stats
         const stats = new Stats()
