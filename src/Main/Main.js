@@ -90,7 +90,7 @@ export default class Main{
         const renderer = new Renderer(canvas, sizes.width, sizes.height, sizes.pixelRatio)    
 
         //Animate
-        const animate = new Animate(scene, camera, renderer.renderer, params.floorDistance, geometry.wireframe, geometry.particles)
+        const animate = new Animate(scene, camera, renderer.renderer, params.floorDistance, geometry.wireframe, geometry.particles, geometry.materialWave)
 
         //Stats
         const stats = new Stats()

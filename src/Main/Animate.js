@@ -2,7 +2,7 @@ import * as THREE from 'three'
 
 export default class Animate{
     
-    constructor(scene, camera, renderer, floorDistance, wireframe, particles){
+    constructor(scene, camera, renderer, floorDistance, wireframe, particles, materialWave){
 
         const clock = new THREE.Clock()
         let lastElapsedTime = 0
@@ -32,6 +32,9 @@ export default class Animate{
             wireframe.rotation.y += 0.001;
 
             //Animate Particles
+            const h = ( 360 * (0.5 + lastElapsedTime*0.01 ) % 360 ) / 360;
+
+            materialWave.uniforms.color = {value: new THREE.Color().setHSL( h,0.4,0.4 )}
 
             const positions = particles.geometry.attributes.position.array;
 			const scales = particles.geometry.attributes.scale.array;

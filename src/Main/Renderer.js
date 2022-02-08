@@ -2,7 +2,7 @@ import * as THREE from 'three'
 
 export default class Renderer{
     
-    constructor(canvas,width,height, pixelRatio){
+    constructor(canvas, width, height, pixelRatio){
 
         this.renderer = new THREE.WebGLRenderer({
             canvas: canvas,
@@ -14,5 +14,6 @@ export default class Renderer{
         this.renderer.outputEncoding = THREE.sRGBEncoding
         this.renderer.toneMapping = THREE.ReinhardToneMapping
         this.renderer.toneMappingExposure = 1
+
     }
 }

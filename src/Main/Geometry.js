@@ -64,10 +64,10 @@ export default class Geometry{
         geometryWave.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) )
         geometryWave.setAttribute( 'scale', new THREE.BufferAttribute( scales, 1 ) )
 
-        const materialWave = new THREE.ShaderMaterial({
+        this.materialWave = new THREE.ShaderMaterial({
             transparent:true,
             uniforms: {
-                color: { value: new THREE.Color( 0x006d6d ) },
+                color: { value: new THREE.Color().setHSL( 0.48,0.4,0.4 ) },
             },
             vertexShader:`
             attribute float scale;
@@ -83,21 +83,19 @@ export default class Geometry{
 			}`,
             fragmentShader: `
             uniform vec3 color;
-
+            
 			void main() {
 
 				if ( length( gl_PointCoord - vec2( 0.5, 0.5 ) ) > 0.475 ) discard;
 
-				gl_FragColor = vec4( color, 1.0 );
+				gl_FragColor = vec4( color, 1 );
 
 			}`
         })
 
-        this.particles = new THREE.Points( geometryWave, materialWave );
+        this.particles = new THREE.Points( geometryWave, this.materialWave );
         this.particles.rotation.y = Math.PI/4
 		scene.add( this.particles );
-
-
 
 
 
