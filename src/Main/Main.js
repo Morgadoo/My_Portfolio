@@ -41,11 +41,7 @@ export default class Main{
 
         //Layers
 
-        //Dat.gui
-        // this.datgui = new DatGui()
-        // const datgui = new dat.GUI({closed: false, width: 400})
-
-
+    
         // Loader Maneger
         const loaderManeger = new LoaderManeger(scene, overlay.overlayMaterial)
 

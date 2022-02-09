@@ -28,11 +28,9 @@ export default class Animate{
             camera.position.y += valuey
             camera.lookAt(0,1-(scrollScale*floorDistance),0)
 
-            //Animate wireframe
-            wireframe.rotation.y += 0.001;
 
             //Animate Particles
-            const h = ( 360 * (0.5 + lastElapsedTime*0.01 ) % 360 ) / 360;
+            const h = ( 360 * (0.5 + lastElapsedTime*0.03 ) % 360 ) / 360;
 
             materialWave.uniforms.color = {value: new THREE.Color().setHSL( h,0.4,0.4 )}
 

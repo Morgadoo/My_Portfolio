@@ -269,7 +269,7 @@ input, select, textarea {
 	@media screen and (max-width: 736px) {
 
 		h2 {
-			font-size: 1.5em;
+			font-size: 2em;
 		}
 
 	}
@@ -318,7 +318,7 @@ input, select, textarea {
 /* Box */
 
 	.box {
-		background: #242424;;
+		background: #000000b5; /* #242424 */
 		color: #CBCBCB;
 		padding: 2em;
 	}

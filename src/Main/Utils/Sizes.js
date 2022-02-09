@@ -14,10 +14,14 @@ export default class Sizes{
         this.height = window.innerHeight
         this.pixelRatio = Math.min(window.devicePixelRatio, 2)
         
-        if (this.width < 800){
+        if (this.width < 736){
             camera.fov = 35
+            plane2Mesh.position.z = -0.3
+            iconsMesh.position.z = -0.3
         }else {
             camera.fov = 25
+            plane2Mesh.position.z =  0.5
+            iconsMesh.position.z = 0.5
         }
 
         // Update camera
@@ -28,6 +32,6 @@ export default class Sizes{
         renderer.setSize(this.width, this.height)
         renderer.setPixelRatio(this.pixelRatio)
 
-        console.log("Update resize", this.width)
+        // console.log("Update resize", this.width)
     }
 }

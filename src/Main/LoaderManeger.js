@@ -39,32 +39,33 @@ export default class LoaderManeger{
 
         const textureLoader = new THREE.TextureLoader(loadingManager)
 
-        const texture_bake1 = textureLoader.load("gltf/bake1.jpg")
-        texture_bake1.flipY = false
-        texture_bake1.encoding = THREE.sRGBEncoding
-        texture_bake1.minFilter = THREE.LinearFilter
+        const texture_floor1 = textureLoader.load("gltf/objects_floor.jpg")
+        texture_floor1.flipY = false
+        texture_floor1.encoding = THREE.sRGBEncoding
+        texture_floor1.minFilter = THREE.LinearFilter
 
-        const texture_bake1_1 = textureLoader.load("gltf/bake1_1.jpg")
-        texture_bake1_1.flipY = false
-        texture_bake1_1.encoding = THREE.sRGBEncoding
-        texture_bake1_1.minFilter = THREE.LinearFilter
+        const texture_floor2 = textureLoader.load("gltf/icons_floor.jpg")
+        texture_floor2.flipY = false
+        texture_floor2.encoding = THREE.sRGBEncoding
+        texture_floor2.minFilter = THREE.LinearFilter
 
+        const texture_mask = textureLoader.load("gltf/mask.jpg")
+        texture_mask.minFilter = THREE.LinearFilter
 
+        const texture_objects = textureLoader.load("gltf/objects.jpg")
+        texture_objects.flipY = false
+        texture_objects.encoding = THREE.sRGBEncoding
+        texture_objects.minFilter = THREE.LinearFilter
 
-        const texture_bake1_mask = textureLoader.load("gltf/bake1_mask.jpg")
-        texture_bake1_mask.minFilter = THREE.LinearFilter
+        const texture_icons = textureLoader.load("gltf/icons.jpg")
+        texture_icons.flipY = false
+        texture_icons.encoding = THREE.sRGBEncoding
+        texture_icons.minFilter = THREE.LinearFilter
 
-        const texture_bake2 = textureLoader.load("gltf/bake2.jpg")
-        texture_bake2.flipY = false
-        texture_bake2.encoding = THREE.sRGBEncoding
-        texture_bake2.minFilter = THREE.LinearFilter
-
-
-
-        const texture_bake3 = textureLoader.load("gltf/bake3.jpg")
-        texture_bake3.flipY = false
-        texture_bake3.encoding = THREE.sRGBEncoding
-        texture_bake3.minFilter = THREE.LinearFilter
+        const texture_lights = textureLoader.load("gltf/lights.jpg")
+        texture_lights.flipY = false
+        texture_lights.encoding = THREE.sRGBEncoding
+        texture_lights.minFilter = THREE.LinearFilter
 
 
         /**
@@ -101,11 +102,13 @@ export default class LoaderManeger{
 
         // GLTF Materials
 
-        const  bake1Material = new THREE.MeshBasicMaterial({ map: texture_bake1, alphaMap:texture_bake1_mask, side: THREE.FrontSide, transparent: true})
-        const  bake1_1Material = new THREE.MeshBasicMaterial({ map: texture_bake1_1, alphaMap:texture_bake1_mask, side: THREE.FrontSide, transparent: true})
-        const  bake1BackSideMaterial = new THREE.MeshBasicMaterial({color: 0x000000, alphaMap:texture_bake1_mask, side: THREE.BackSide, transparent: true})
-        const  bake2Material = new THREE.MeshBasicMaterial({map: texture_bake2})
-        const  bake3Material = new THREE.MeshBasicMaterial({map: texture_bake3})
+        const  floor1Material = new THREE.MeshBasicMaterial({ map: texture_floor1, alphaMap:texture_mask, side: THREE.FrontSide, transparent: true})
+        const  floor2Material = new THREE.MeshBasicMaterial({ map: texture_floor2, alphaMap:texture_mask, side: THREE.FrontSide, transparent: true})
+        const  backfloorMaterial = new THREE.MeshBasicMaterial({color: 0x000000, alphaMap:texture_mask, side: THREE.BackSide, transparent: true})
+        const  objectsMaterial = new THREE.MeshBasicMaterial({map: texture_objects})
+        const  iconsMaterial = new THREE.MeshBasicMaterial({map: texture_icons})
+        const  lightsMaterial = new THREE.MeshBasicMaterial({map: texture_lights})
+
 
         const lightBlueMaterial = new THREE.MeshBasicMaterial({color: 0x00B8FF})
         const lightWhiteMaterial = new THREE.MeshBasicMaterial({color: 0xFFFFFF})
@@ -122,42 +125,53 @@ export default class LoaderManeger{
         gltfLoader.setDRACOLoader(dracoLoader)
 
         gltfLoader.load(
-            "/gltf/scene_simple.glb",
+            "/gltf/scene.glb",
             (gltf) => {
 
-                //Scene 1
+                //Floor 1
                 const lightBlueMesh = gltf.scene.children.find(child => child.name == "light_blue")
                 const lightWhiteMesh = gltf.scene.children.find(child => child.name == "light_white")
                 const planeMesh = gltf.scene.children.find(child => child.name == "plane")
-                const planeBackSideMesh = planeMesh.clone()
+                window.iconsMesh = gltf.scene.children.find(child => child.name == "icons")
                 const objectsMesh = gltf.scene.children.find(child => child.name == "objects")
                 const lightsMesh = gltf.scene.children.find(child => child.name == "lights")
 
+                const planeBackSideMesh = planeMesh.clone()
+                
+
                 lightBlueMesh.material = lightBlueMaterial
                 lightWhiteMesh.material = lightWhiteMaterial
-                planeMesh.material = bake1Material
-                planeBackSideMesh.material = bake1BackSideMaterial
 
-                objectsMesh.material = bake2Material
-                lightsMesh.material = bake3Material
+                planeMesh.material = floor1Material
+                planeBackSideMesh.material = backfloorMaterial
 
-                planeMesh.position.y =+ -0.0001
-                planeBackSideMesh.position.y =+ -0.0001
+                objectsMesh.material = objectsMaterial
+                lightsMesh.material = lightsMaterial
+
                 scene.add(planeBackSideMesh)
 
-                //Scene 2
-                const plane2Mesh = planeMesh.clone()
+                //Floor 2
+                window.plane2Mesh = planeMesh.clone()
                 const plane2BackSideMesh = planeMesh.clone()
 
-                plane2Mesh.material = bake1_1Material
-                plane2BackSideMesh.material = bake1BackSideMaterial
+                plane2Mesh.material = floor2Material
+                plane2BackSideMesh.material = backfloorMaterial
+
+                iconsMesh.material = iconsMaterial
 
                 plane2Mesh.position.y =+ -floorDistance
-                plane2BackSideMesh.position.y =+ -floorDistance
+                plane2BackSideMesh.position.y =+ -floorDistance-offsetDistance
+                iconsMesh.position.y =+ -floorDistance
 
-
-                scene.add(plane2Mesh,plane2BackSideMesh)
-
+                if (window.innerWidth < 736){
+                    plane2Mesh.position.z = -0.3
+                    iconsMesh.position.z = -0.3
+                }else {
+                    plane2Mesh.position.z = 0.5
+                    iconsMesh.position.z = 0.5
+                }
+            
+                scene.add(plane2Mesh, plane2BackSideMesh, iconsMesh)
 
                 console.log(gltf.scene.children)
                 scene.add(gltf.scene)

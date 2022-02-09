@@ -7,33 +7,6 @@ export default class Geometry{
     
     constructor(scene){
 
-        const floorDistance = 4
-        const offsetDistance = 0.05
-
-
-        // Wireframe ( WireframeGeometry2, LineMaterial )
-
-        const geo = new THREE.IcosahedronBufferGeometry( 1.2, 1 )
-
-        const geometry = new WireframeGeometry2( geo )
-
-        const matLine = new LineMaterial( {
-
-            color: 0x49bf9d,
-            linewidth: 0.005, // in pixels
-            //resolution:  // to be set by renderer, eventually
-            dashSize: 0.1,
-            dashScale: 2,
-            gapSize: 0.1,
-            dashed: false
-
-        } );
-
-        this.wireframe = new Wireframe( geometry, matLine )
-        this.wireframe.computeLineDistances()
-        this.wireframe.position.y = -floorDistance - offsetDistance + 1.2     //-floorDistance - offsetDistance + 0.5
-        scene.add( this.wireframe )
-
         //wave
 
         const SEPARATION = 0.3, AMOUNTX = 50, AMOUNTY = 50
