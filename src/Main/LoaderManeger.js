@@ -61,34 +61,12 @@ export default class LoaderManeger{
         texture_icons.flipY = false
         texture_icons.encoding = THREE.sRGBEncoding
         texture_icons.minFilter = THREE.LinearFilter
+        texture_icons.magFilter = THREE.LinearFilter
 
         const texture_lights = textureLoader.load("gltf/lights.jpg")
         texture_lights.flipY = false
         texture_lights.encoding = THREE.sRGBEncoding
         texture_lights.minFilter = THREE.LinearFilter
-
-
-        /**
-         *  Cube Texture Loader
-         */
-
-        // const cubeTextureLoader = new THREE.CubeTextureLoader(loadingManager)
-
-        // Environment Map
-
-        // const environmentMAp = cubeTextureLoader.load([
-        //     "/cube_map/px.png",
-        //     "/cube_map/nx.png",
-        //     "/cube_map/py.png",
-        //     "/cube_map/ny.png",
-        //     "/cube_map/pz.png",
-        //     "/cube_map/nz.png"
-        // ])
-        // environmentMAp.encoding = THREE.sRGBEncoding
-        // scene.background = environmentMAp
-        // scene.background = new THREE.Color( 0x111111 )
-        // scene.environment = environmentMAp
-
 
         /**
          * Models Loader
@@ -116,7 +94,7 @@ export default class LoaderManeger{
         //Varabel
 
         const floorDistance = 4
-        const offsetDistance = 0.05
+        const offsetDistance = 0.005
 
 
         // GLTF Loader
@@ -160,7 +138,7 @@ export default class LoaderManeger{
                 iconsMesh.material = iconsMaterial
 
                 plane2Mesh.position.y =+ -floorDistance
-                plane2BackSideMesh.position.y =+ -floorDistance-offsetDistance
+                plane2BackSideMesh.position.y =+ -floorDistance - offsetDistance
                 iconsMesh.position.y =+ -floorDistance
 
                 if (window.innerWidth < 736){
