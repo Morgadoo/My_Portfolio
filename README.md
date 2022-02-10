@@ -1,6 +1,6 @@
 # My Threejs Portfolio
 
-[![Image](https://i.imgur.com/vaLvGZz.jpg)]()
+[![Image](https://i.imgur.com/vaLvGZz.jpg)]
 
 ## Setup
 Download [Node.js](https://nodejs.org/en/download/).
