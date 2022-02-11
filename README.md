@@ -1,5 +1,7 @@
 # My Threejs Portfolio
 
+![Image](https://i.imgur.com/vaLvGZz.jpg)
+
 ## Setup
 Download [Node.js](https://nodejs.org/en/download/).
 Run this followed commands:

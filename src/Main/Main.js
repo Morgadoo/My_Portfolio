@@ -89,7 +89,7 @@ export default class Main{
         const animate = new Animate(scene, camera, renderer.renderer, params.floorDistance, geometry.wireframe, geometry.particles, geometry.materialWave)
 
         //Stats
-        const stats = new Stats()
+        // const stats = new Stats()
 
 
 

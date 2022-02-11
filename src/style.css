@@ -43,8 +43,22 @@ html{
 	text-decoration: none;
 	bottom: 0.25em;
 	right: 0.5em;
-	/* font-size: 1.2em;  */
-	font-size:x-large;
+	font-size: 1.5em;
+}
+
+::-webkit-scrollbar {
+background: transparent;
+width: 6px;
+height: 6px;
+  }
+  
+::-webkit-scrollbar-thumb {
+background: rgb(72, 72, 72);
+border-radius: 10px;
+}
+
+::-webkit-scrollbar-corner{
+	border-radius: 10px;
 }
 
 /* ----------------------------------------------------------------------------------------- */
