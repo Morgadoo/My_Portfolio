@@ -11,7 +11,7 @@ export default class Renderer{
         })
         this.renderer.setSize(width, height)
         this.renderer.setPixelRatio(pixelRatio)
-        this.renderer.outputEncoding = THREE.sRGBEncoding
+        this.renderer.outputColorSpace = THREE.SRGBColorSpace
         this.renderer.toneMapping = THREE.ReinhardToneMapping
         this.renderer.toneMappingExposure = 1
 
