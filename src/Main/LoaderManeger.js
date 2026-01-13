@@ -59,13 +59,13 @@ export default class LoaderManeger{
 
         const texture_icons = textureLoader.load("gltf/icons.jpg")
         texture_icons.flipY = false
-        texture_icons.encoding = THREE.sRGBEncoding
+        texture_icons.colorSpace = THREE.SRGBColorSpace
         texture_icons.minFilter = THREE.LinearFilter
         texture_icons.magFilter = THREE.LinearFilter
 
         const texture_lights = textureLoader.load("gltf/lights.jpg")
         texture_lights.flipY = false
-        texture_lights.encoding = THREE.sRGBEncoding
+        texture_lights.colorSpace = THREE.SRGBColorSpace
         texture_lights.minFilter = THREE.LinearFilter
 
         /**
