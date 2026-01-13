@@ -41,12 +41,12 @@ export default class LoaderManeger{
 
         const texture_floor1 = textureLoader.load("gltf/objects_floor.jpg")
         texture_floor1.flipY = false
-        texture_floor1.encoding = THREE.sRGBEncoding
+        texture_floor1.colorSpace = THREE.SRGBColorSpace
         texture_floor1.minFilter = THREE.LinearFilter
 
         const texture_floor2 = textureLoader.load("gltf/icons_floor.jpg")
         texture_floor2.flipY = false
-        texture_floor2.encoding = THREE.sRGBEncoding
+        texture_floor2.colorSpace = THREE.SRGBColorSpace
         texture_floor2.minFilter = THREE.LinearFilter
 
         const texture_mask = textureLoader.load("gltf/mask.jpg")
@@ -54,18 +54,18 @@ export default class LoaderManeger{
 
         const texture_objects = textureLoader.load("gltf/objects.jpg")
         texture_objects.flipY = false
-        texture_objects.encoding = THREE.sRGBEncoding
+        texture_objects.colorSpace = THREE.SRGBColorSpace
         texture_objects.minFilter = THREE.LinearFilter
 
         const texture_icons = textureLoader.load("gltf/icons.jpg")
         texture_icons.flipY = false
-        texture_icons.encoding = THREE.sRGBEncoding
+        texture_icons.colorSpace = THREE.SRGBColorSpace
         texture_icons.minFilter = THREE.LinearFilter
         texture_icons.magFilter = THREE.LinearFilter
 
         const texture_lights = textureLoader.load("gltf/lights.jpg")
         texture_lights.flipY = false
-        texture_lights.encoding = THREE.sRGBEncoding
+        texture_lights.colorSpace = THREE.SRGBColorSpace
         texture_lights.minFilter = THREE.LinearFilter
 
         /**
